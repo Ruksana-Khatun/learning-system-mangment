@@ -10,7 +10,6 @@ import courseRoutes from './routes/course.routes.js';
 import paymentRoutes from './routes/payment.routes.js';
 import upload from "./middlewares/multer.middleware.js";
 import { login, register } from "./controllers/user.controller.js";
-import { contactUs } from "./controllers/contact.controller.js";
 
 config();
 const app = express();
@@ -18,24 +17,16 @@ const app = express();
 // middleware
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+// CORS – allow frontend dev server and tools to call the API
+// In development we accept any origin and send credentials (cookies).
+// For production, you can tighten this to a specific domain.
 app.use(
   cors({
     origin: (origin, callback) => {
-      const allowedOrigins = [
-        process.env.FRONTEND_URL,
-        "http://localhost:5173",
-        "http://localhost:3000",
-      ].filter(Boolean);
-
-      // Allow server-to-server / tools with no origin
-      if (!origin) return callback(null, true);
-      if (allowedOrigins.includes(origin)) return callback(null, true);
-
-      return callback(new Error(`Not allowed by CORS: ${origin}`));
+      // Allow server-to-server / Postman (no origin) and all browser origins in dev
+      callback(null, true);
     },
     credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
 app.use(cookieParser());
@@ -55,9 +46,6 @@ app.get("/api/v1", (req, res) => {
 // Auth routes at /api/auth/* (explicit so they always match)
 app.post("/api/auth/login", login);
 app.post("/api/auth/register", upload.single("avatar"), register);
-
-// Contact form route
-app.post("/api/v1/contact", contactUs);
 
 // Fix malformed logout path (e.g. /user/%20logout -> /user/logout)
 app.use((req, res, next) => {

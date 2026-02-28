@@ -34,7 +34,18 @@ const userSchema = new mongoose.Schema(
       enum: ["user", "admin"],
       default: "user",
     },
-    
+    subscription: {
+      id: String,
+      status: {
+        type: String,
+        enum: ["active", "cancelled", "inactive", "created", "authenticated", ""],
+        default: "",
+      },
+    },
+    enrolledCourses: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Course",
+    }],
     forgotPasswordToken: String,
     forgotPasswordExpiryDate: Date,
   },

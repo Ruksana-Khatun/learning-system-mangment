@@ -27,8 +27,7 @@ router.post('/register',upload.single("avatar"), register);
 router.post('/login',login)
 router.get('/logout', logout);
 router.post('/logout', logout);
-router.get('/me', isLoggedIn, getProfile)
-router.put('/me', isLoggedIn, upload.single("avatar"), updateUser)
+router.get('/me', isLoggedIn,getProfile)
 router.post('/reset',forgotPassword)
 router.post('/reset/:resetToken',resetPassword)
 router.post('/change-password',isLoggedIn,changePassword)

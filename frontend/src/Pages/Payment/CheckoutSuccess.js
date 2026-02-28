@@ -1,9 +1,17 @@
-import React from "react";
+import React, { useEffect } from "react";
 import Layout from "../../Layout/Layout";
 import { AiFillCheckCircle } from "react-icons/ai";
 import { Link } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { refreshUserData } from "../../Redux/authSlice";
 
 const CheckoutSuccess = () => {
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(refreshUserData());
+  }, [dispatch]);
+
   return (
     <Layout>
       {/* container for checkout success card  */}
@@ -32,9 +40,9 @@ const CheckoutSuccess = () => {
           {/* adding back to homepage button */}
           <Link
             className="bg-green-500 hover:bg-green-600 transition-all ease-in-out duration-300 absolute bottom-0 w-full text-center py-2 text-xl font-bold rounded-bl-lg rounded-br-lg"
-            to={"/"}
+            to={"/courses"}
           >
-            <button>Go to Dashboard</button>
+            <button>Go to Courses</button>
           </Link>
         </div>
       </div>

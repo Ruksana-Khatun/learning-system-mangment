@@ -1,5 +1,5 @@
 import Router from 'express';
-import {getRazorpayKey,buySubscription,verifySubscription, cancelSubscribe} from '../controllers/payment.controller.js';
+import { getRazorpayKey, buySubscription, verifySubscription, cancelSubscribe, createCourseOrder, verifyCoursePayment } from '../controllers/payment.controller.js';
 import { isLoggedIn } from '../middlewares/auth.middlewares.js';
 import { authorizedRoles } from '../middlewares/auth.middlewares.js';
 import { allPayment } from '../controllers/payment.controller.js';
@@ -21,6 +21,8 @@ router.route('/verify')
     isLoggedIn,
     verifySubscription
 );
+router.route('/order').post(isLoggedIn, createCourseOrder);
+router.route('/verify-order').post(isLoggedIn, verifyCoursePayment);
 router.route('/unsubScribe').post(isLoggedIn, cancelSubscribe);
 router.route('/unsubscribe').post(isLoggedIn, cancelSubscribe);
 router.route('/')

@@ -167,7 +167,7 @@ const AdminDashboard = () => {
                 <div className="flex flex-col items-center">
                   <p className="font-semibold">Total Revenue</p>
                   <h3 className="text-4xl font-bold">
-                    {allPayments?.count * 499}
+                    {allPayments?.count * 4000}
                   </h3>
                 </div>
                 <GiMoneyStack className="text-green-500 text-5xl" />

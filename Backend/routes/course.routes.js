@@ -1,6 +1,6 @@
 
 import {Router} from 'express';
-import { getAllCourses, getLecturesCourseById, createCourse,updateCourse,removeCourse,addLectureToCourseBYid, removeLectureFromCourse} from '../controllers/course.controller.js';
+import { getAllCourses, getLecturesCourseById, createCourse,updateCourse,removeCourse,addLectureToCourseBYid} from '../controllers/course.controller.js';
 import { isLoggedIn,authorizedRoles } from '../middlewares/auth.middlewares.js';
 import upload from "../middlewares/multer.middleware.js";
 const router = Router();
@@ -11,12 +11,6 @@ router.route('/')
     isLoggedIn,
     authorizedRoles("admin"),
     createCourse
-)
-// delete a single lecture using query params ?courseId=&lectureId=
-.delete(
-    isLoggedIn,
-    authorizedRoles("admin"),
-    removeLectureFromCourse
 )
 
 

@@ -1,12 +1,17 @@
 import React, { useEffect } from "react";
-// import { useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
 import Layout from "../../Layout/Layout";
 
 const CourseDescription = () => {
   const { state } = useLocation();
   const navigate = useNavigate();
-  // const { data } = useSelector((state) => state.auth);
+  const userData = useSelector((state) => state.auth.data);
+  const enrolledCourseIds = userData?.enrolledCourses || [];
+  const isEnrolled = enrolledCourseIds.some(
+    (id) => String(id) === String(state?._id)
+  );
+  const canStartLearning = state?.isFree || isEnrolled;
 
   useEffect(() => {
     // scroll to the top on page render
@@ -45,7 +50,7 @@ const CourseDescription = () => {
               </div>
 
               {/* adding the subscribe button */}
-              {state.isFree ? (
+              {canStartLearning ? (
                 <button
                   onClick={() =>
                     navigate("/course/displaylectures", {
@@ -58,7 +63,9 @@ const CourseDescription = () => {
                 </button>
               ) : (
                 <button
-                  onClick={() => navigate("/checkout")}
+                  onClick={() =>
+                    navigate("/checkout", { state: { course: state } })
+                  }
                   className="bg-yellow-600 text-xl rounded-md font-bold px-5 py-3 w-full hover:bg-yellow-500 transition-all ease-in-out duration-300"
                 >
                   Buy Now
@@ -79,7 +86,7 @@ const CourseDescription = () => {
     <span className="text-yellow-500">₹ {state.price} only</span>
   )} */}
   {state.isFree && (
-    <span className="text-yellow-500">Included in ₹499 subscription</span>
+    <span className="text-yellow-500">Included in ₹4000 subscription</span>
   )}
 </p>
 

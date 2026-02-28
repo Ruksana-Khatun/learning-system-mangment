@@ -5,6 +5,8 @@ import axiosInstance from "../Helper/axiosInstance";
 const initialState = {
   key: "",
   subscription_id: "",
+  order_id: "",
+  courseIdForOrder: "",
   isPaymentVerified: false,
   allPayments: {},
   finalMonths: {},
@@ -34,7 +36,7 @@ export const purchaseCourseBundle = createAsyncThunk(
   }
 );
 
-// function to verify the user payment
+// function to verify the user payment (subscription)
 export const verifyUserPayment = createAsyncThunk(
   "/verifyPayment",
   async (paymentDetail) => {
@@ -47,6 +49,34 @@ export const verifyUserPayment = createAsyncThunk(
       return res?.data;
     } catch (error) {
       toast.error("error?.response?.data?.message");
+    }
+  }
+);
+
+// Create order for single course purchase
+export const createCourseOrder = createAsyncThunk(
+  "/payment/order",
+  async (courseId) => {
+    try {
+      const res = await axiosInstance.post("/payment/order", { courseId });
+      return res?.data;
+    } catch (error) {
+      toast.error(error?.response?.data?.message || "Failed to create order");
+      throw error;
+    }
+  }
+);
+
+// Verify single course payment and enroll user
+export const verifyCoursePayment = createAsyncThunk(
+  "/verifyCoursePayment",
+  async (payload) => {
+    try {
+      const res = await axiosInstance.post("/payment/verify-order", payload);
+      return res?.data;
+    } catch (error) {
+      toast.error(error?.response?.data?.message || "Payment verification failed");
+      throw error;
     }
   }
 );
@@ -116,6 +146,10 @@ const razorpaySlice = createSlice({
         state.allPayments = action?.payload?.allPayments;
         state.finalMonths = action?.payload?.finalMonths;
         state.monthlySalesRecord = action?.payload?.monthlySalesRecord;
+      })
+      .addCase(createCourseOrder.fulfilled, (state, action) => {
+        state.order_id = action?.payload?.order_id;
+        state.courseIdForOrder = action?.payload?.courseId;
       });
   },
 });

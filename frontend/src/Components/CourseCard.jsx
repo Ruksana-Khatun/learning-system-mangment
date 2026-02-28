@@ -37,7 +37,7 @@ const CourseCard = ({ data }) => {
         </p>
         <p className="font-bold text-lg mt-2">
           {!data.isFree && (
-            <span className="text-yellow-500">₹ 499 only</span>
+            <span className="text-yellow-500">₹ 4000 only</span>
           )}
           {data.isFree && (
             <span className="text-green-400">Free</span>

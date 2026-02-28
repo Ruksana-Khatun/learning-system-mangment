@@ -158,6 +158,78 @@ export const cancelSubscribe = async (req, res, next) => {
 
 
 
+// One-time payment for a single course
+const COURSE_AMOUNT_PAISE = 4000 * 100; // ₹4000 in paise
+
+export const createCourseOrder = async (req, res, next) => {
+    try {
+        if (!ensureRazorpayConfigured(next)) return;
+
+        const { courseId } = req.body;
+        if (!courseId) {
+            return next(new ErrorApp('Course ID is required', 400));
+        }
+
+        const order = await razorpay.orders.create({
+            amount: COURSE_AMOUNT_PAISE,
+            currency: 'INR',
+        });
+
+        res.status(200).json({
+            success: true,
+            order_id: order.id,
+            courseId,
+        });
+    } catch (error) {
+        console.error('Create order error:', error);
+        return next(new ErrorApp('Failed to create order', 500));
+    }
+};
+
+export const verifyCoursePayment = async (req, res, next) => {
+    try {
+        if (!ensureRazorpayConfigured(next)) return;
+
+        const { razorpay_order_id, razorpay_payment_id, razorpay_signature, courseId } = req.body;
+        if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature || !courseId) {
+            return next(new ErrorApp('Missing payment or course details', 400));
+        }
+
+        const generated_signature = crypto.createHmac('sha256', process.env.RAZORPAY_API_SECRET)
+            .update(`${razorpay_order_id}|${razorpay_payment_id}`)
+            .digest('hex');
+
+        if (generated_signature !== razorpay_signature) {
+            return next(new ErrorApp('Payment verification failed', 400));
+        }
+
+        const userId = req.user.id;
+        const user = await User.findById(userId);
+        if (!user) {
+            return next(new ErrorApp('User not found', 404));
+        }
+
+        if (!user.enrolledCourses) {
+            user.enrolledCourses = [];
+        }
+        const alreadyEnrolled = user.enrolledCourses.some(
+            (id) => id.toString() === courseId.toString()
+        );
+        if (!alreadyEnrolled) {
+            user.enrolledCourses.push(courseId);
+            await user.save();
+        }
+
+        res.status(200).json({
+            success: true,
+            message: 'Course purchased successfully',
+        });
+    } catch (error) {
+        console.error('Verify course payment error:', error);
+        return next(new ErrorApp('Failed to verify payment', 500));
+    }
+};
+
 export const allPayment = async (req, res, next) => {
     try {
         const payments = await payment.find().sort({ createdAt: -1 });
