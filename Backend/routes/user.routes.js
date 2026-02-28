@@ -1,0 +1,37 @@
+// File: routes/user.routes.js
+import express from 'express';
+import { isLoggedIn } from '../middlewares/auth.middlewares.js';
+import {login, register, logout, getProfile, forgotPassword, resetPassword, changePassword, updateUser} from '../controllers/user.controller.js'; 
+import upload from '../middlewares/multer.middleware.js';
+import { v2 as cloudinary } from 'cloudinary';
+
+const router = express.Router(); 
+
+// Test route for Cloudinary
+router.get('/test-cloudinary', async (req, res) => {
+    try {
+        const result = await cloudinary.api.ping();
+        res.json({ success: true, message: 'Cloudinary connection successful', result });
+    } catch (error) {
+        console.error('Cloudinary test error:', error);
+        res.status(500).json({ 
+            success: false, 
+            message: 'Cloudinary connection failed',
+            error: error.message 
+        });
+    }
+});
+
+router.get('/ logout', logout); // handle malformed path with space (e.g. %20)
+router.post('/register',upload.single("avatar"), register);
+router.post('/login',login)
+router.get('/logout', logout);
+router.post('/logout', logout);
+router.get('/me', isLoggedIn, getProfile)
+router.put('/me', isLoggedIn, upload.single("avatar"), updateUser)
+router.post('/reset',forgotPassword)
+router.post('/reset/:resetToken',resetPassword)
+router.post('/change-password',isLoggedIn,changePassword)
+router.post('/update/:id',isLoggedIn,upload.single("avatar"),updateUser)
+
+export default router;
